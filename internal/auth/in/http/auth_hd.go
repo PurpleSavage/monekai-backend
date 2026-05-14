@@ -3,7 +3,6 @@ package http
 import (
 	"encoding/json"
 	"net/http"
-
 	authdtos "github.com/purplesvage/moneka-ai/internal/auth/in/dtos"
 	authusecases "github.com/purplesvage/moneka-ai/internal/auth/usecases"
 	domainerrors "github.com/purplesvage/moneka-ai/internal/shared/domain/errors"
@@ -65,7 +64,7 @@ func (h *AuthHandler) GetProfile(w http.ResponseWriter, r *http.Request){
 
 
 func MapRoutes(mux *http.ServeMux, h *AuthHandler) {
-    mdls := []func(http.Handler) http.Handler{
+    mdls := []middlewares.Middleware{
 		h.authMiddleware.RefreshToken,
 	}
 
@@ -73,7 +72,7 @@ func MapRoutes(mux *http.ServeMux, h *AuthHandler) {
 	mux.HandleFunc("POST /login", h.Login)
 
 
-    // ruta profile
+    // ruta 
 	protectedHandler := middlewares.ContextMiddleware(
 		http.HandlerFunc(h.GetProfile),
 		mdls,

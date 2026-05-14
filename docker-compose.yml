@@ -27,8 +27,8 @@ services:
       - USER=${DB_USER}
       - DB_PASSWORD=${DB_PASS}
       - DB_NAME=${DB_NAME}
-      - DB_PORT=5432
-      - SSLMODE=disable
+      - DB_PORT=${DB_PORT}
+      - SSLMODE=${SSLMODE}
       - JWT_SECRET=${JWT_SECRET}
       - CLERK_KEY=${CLERK_KEY}
       - PUBLIC_KEY=${PUBLIC_KEY}

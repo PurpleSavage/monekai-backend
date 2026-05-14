@@ -1,5 +1,4 @@
 package main
-
 import (
 	"fmt"
 	"log"
@@ -9,6 +8,7 @@ import (
 	"github.com/purplesvage/moneka-ai/internal/auth"
 	authHttp "github.com/purplesvage/moneka-ai/internal/auth/in/http"
 )
+
 func main(){
 	mainMux := http.NewServeMux()
 	config.LoadEnvs()

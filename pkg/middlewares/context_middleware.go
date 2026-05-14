@@ -2,7 +2,8 @@ package middlewares
 
 import "net/http"
 
-func ContextMiddleware(next http.Handler, middlewares []func(next http.Handler) http.Handler) http.Handler {
+type Middleware func(http.Handler) http.Handler
+func ContextMiddleware(next http.Handler, middlewares []Middleware ) http.Handler {
 	finalHandler := next
 
 	for i := len(middlewares) - 1; i >= 0; i-- {
