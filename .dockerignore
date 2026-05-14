@@ -1,0 +1,24 @@
+# --- Git ---
+.git
+.gitignore
+
+# --- Variables de entorno ---
+# Es mejor inyectarlas vía Docker Compose que copiarlas dentro de la imagen
+.env
+
+# --- Documentación ---
+README.md
+docs/
+
+# --- Binarios locales ---
+# No queremos copiar el binario compilado en tu Windows/Mac, 
+# el Dockerfile lo compilará dentro de Linux.
+main
+bin/
+
+# --- Datos de la DB ---
+postgres_data/
+
+# --- IDEs ---
+.vscode
+.idea

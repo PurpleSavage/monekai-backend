@@ -1,0 +1,30 @@
+# --- Binarios y ejecutables ---
+main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# --- Variables de entorno (CRÍTICO) ---
+# Nunca subas tus llaves secretas a GitHub
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --- Dependencias de Go ---
+# Generalmente no se sube la carpeta vendor si usas go modules
+vendor/
+
+# --- IDEs y Editores ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Docker ---
+# Si usas volúmenes locales para persistencia de datos
+postgres_data/
