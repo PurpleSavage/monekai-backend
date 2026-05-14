@@ -15,12 +15,14 @@ import (
 
 type AuthHandler struct {
     loginUseCase *authusecases.LoginUseCase
-  
+    authMiddleware *privatemiddlewares.AuthMiddleware
 }
 
-func NewAuthHandler(lu *authusecases.LoginUseCase) *AuthHandler {
+func NewAuthHandler(lu *authusecases.LoginUseCase,
+    am *privatemiddlewares.AuthMiddleware,) *AuthHandler {
 	return &AuthHandler{
         loginUseCase: lu,
+        authMiddleware: am,
     }
 }
 
@@ -63,16 +65,18 @@ func (h *AuthHandler) GetProfile(w http.ResponseWriter, r *http.Request){
 
 
 func MapRoutes(mux *http.ServeMux, h *AuthHandler) {
-	mux.HandleFunc("POST /login", h.Login)
-
     mdls := []func(http.Handler) http.Handler{
-		privatemiddlewares.AuthMiddleware,
+		h.authMiddleware.RefreshToken,
 	}
 
+    //ruta login
+	mux.HandleFunc("POST /login", h.Login)
+
+
+    // ruta profile
 	protectedHandler := middlewares.ContextMiddleware(
 		http.HandlerFunc(h.GetProfile),
 		mdls,
 	)
-
 	mux.Handle("POST /profile", protectedHandler)
 }

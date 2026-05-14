@@ -5,11 +5,12 @@ import (
 	"github.com/purplesvage/moneka-ai/internal/auth/domain/ports"
 	authvalueobjects "github.com/purplesvage/moneka-ai/internal/auth/domain/valueobjects"
 	"github.com/purplesvage/moneka-ai/internal/shared/domain/exceptions"
+	sharedports "github.com/purplesvage/moneka-ai/internal/shared/domain/ports"
 )
 
 
 type LoginUseCase struct{
-	jwtService  authports.JwtPort
+	jwtService  sharedports.JwtPort
 	repo authports.UserPersistencePort
 	authService authports.AuthProviderPort
     registerUseCase *RegisterUseCase
@@ -17,7 +18,7 @@ type LoginUseCase struct{
     updateSessionUC *UpdateSessionUseCase
 }
 
-func NewLoginUseCase(jwt authports.JwtPort,
+func NewLoginUseCase(jwt sharedports.JwtPort,
 	repo authports.UserPersistencePort,
 	authService authports.AuthProviderPort,
     registerUC *RegisterUseCase, 

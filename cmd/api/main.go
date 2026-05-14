@@ -4,22 +4,25 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	"github.com/purplesvage/moneka-ai/cmd/config"
 	"github.com/purplesvage/moneka-ai/pkg/connection"
-
 	"github.com/purplesvage/moneka-ai/internal/auth"
 	authHttp "github.com/purplesvage/moneka-ai/internal/auth/in/http"
 )
 func main(){
-	
-
-
 	mainMux := http.NewServeMux()
 	config.LoadEnvs()
 
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s")
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		config.Envs.Host,
+		config.Envs.User, 
+		config.Envs.DbPassword,
+		config.Envs.DbName,
+		config.Envs.DbPort,
+		config.Envs.SslMode,
+	)
 	db, err := connection.NewClient(dsn)
 	
 	if err != nil {

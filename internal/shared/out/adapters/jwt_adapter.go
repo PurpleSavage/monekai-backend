@@ -1,17 +1,18 @@
-package authadapters
+package sharedadapters
 
 import (
 	"fmt"
 	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/purplesvage/moneka-ai/cmd/config"
-	authports "github.com/purplesvage/moneka-ai/internal/auth/domain/ports"
 	domainerrors "github.com/purplesvage/moneka-ai/internal/shared/domain/errors"
+	sharedports "github.com/purplesvage/moneka-ai/internal/shared/domain/ports"
 )
 
 type JwtAdapterService struct{}
 
-func NewJwtAdapterService() authports.JwtPort{
+func NewJwtAdapterService() sharedports.JwtPort{
 	return  &JwtAdapterService{}
 }
 
@@ -41,7 +42,7 @@ func (a *JwtAdapterService) GenerateToken(email string, durationStr string) (str
 	return signedToken, nil
 }
 
-func (a *JwtAdapterService) VerifyToken(token string) (jwt.MapClaims, error) {
+func (a *JwtAdapterService) VerifyToken(token string) (string, error) {
 	secret := config.Envs.SecretJwt
 
 	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
@@ -53,12 +54,26 @@ func (a *JwtAdapterService) VerifyToken(token string) (jwt.MapClaims, error) {
 
 	if err != nil {
 		// 401 Unauthorized: Token is expired, malformed, or signature is invalid
-		return nil, domainerrors.NewAppError(401, "Invalid Token", "Session has expired or token is corrupt", err)
+		return "", domainerrors.NewAppError(401, "Invalid Token", "Session has expired or token is corrupt", err)
+	}
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+	if !ok || !parsedToken.Valid {
+		return "", domainerrors.NewAppError(
+			401,
+			"Unauthorized",
+			"Token content is not processable",
+			nil,
+		)
+	}
+	email, ok := claims["sub"].(string)
+	if !ok {
+		return "", domainerrors.NewAppError(
+			401,
+			"Unauthorized",
+			"Invalid token payload",
+			nil,
+		)
 	}
 
-	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok && parsedToken.Valid {
-		return claims, nil
-	}
-
-	return nil, domainerrors.NewAppError(401, "Unauthorized", "Token content is not processable", nil)
+	return email, nil
 }

@@ -4,14 +4,25 @@ import (
 	authHttp "github.com/purplesvage/moneka-ai/internal/auth/in/http"
 	authadapters "github.com/purplesvage/moneka-ai/internal/auth/out/adpaters"
 	authusecases "github.com/purplesvage/moneka-ai/internal/auth/usecases"
+	sharedadapters "github.com/purplesvage/moneka-ai/internal/shared/out/adapters"
+	"github.com/purplesvage/moneka-ai/internal/shared/privatemiddlewares"
 	"gorm.io/gorm"
 )
 
 func Bootstrap(db *gorm.DB) *authHttp.AuthHandler {
 	// 1. Adaptadores (Infraestructura)
 	repo := authadapters.NewUserRepository(db)
-	jwt := authadapters.NewJwtAdapterService()
+	jwt := sharedadapters.NewJwtAdapterService()
 	authProviderService := authadapters.NewAuthProviderAdapter()
+
+
+	// middlewares 
+	authMiddleware := privatemiddlewares.NewAuthMiddleware(
+		jwt,
+	)
+
+
+
 
 	// 2. Casos de Uso de Apoyo (Capa de Aplicación)
 	// Estos son dependencias de los casos de uso principales
@@ -33,5 +44,5 @@ func Bootstrap(db *gorm.DB) *authHttp.AuthHandler {
 	)
 
 	// 4. Handler (Entrada)
-	return authHttp.NewAuthHandler(loginUC)
+	return authHttp.NewAuthHandler(loginUC,authMiddleware)
 }
