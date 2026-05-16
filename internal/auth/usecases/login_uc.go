@@ -67,7 +67,7 @@ func ( l* LoginUseCase) Execute(token string, userAgent string) (*authentities.S
 
 }
 func (l *LoginUseCase) buildSessionResponse(user *authentities.UserEntity, refreshToken string) (*authentities.SessionEntity, error) {
-	accessToken, err := l.jwtService.GenerateToken(user.Email, "15m")
+	accessToken, err := l.jwtService.GenerateToken(user.Email, "1m")
 	if err != nil {
 		return nil, err // O un AppError de dominio si prefieres
 	}

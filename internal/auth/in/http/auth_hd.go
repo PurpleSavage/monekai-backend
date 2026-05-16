@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 	authdtos "github.com/purplesvage/moneka-ai/internal/auth/in/dtos"
 	authusecases "github.com/purplesvage/moneka-ai/internal/auth/usecases"
 	domainerrors "github.com/purplesvage/moneka-ai/internal/shared/domain/errors"
@@ -15,13 +16,21 @@ import (
 type AuthHandler struct {
     loginUseCase *authusecases.LoginUseCase
     authMiddleware *privatemiddlewares.AuthMiddleware
+    findUserUseCase *authusecases.FindUserByEmailUseCase
+    refreshTokenUseCase *authusecases.RefreshTokenUseCase
 }
 
-func NewAuthHandler(lu *authusecases.LoginUseCase,
-    am *privatemiddlewares.AuthMiddleware,) *AuthHandler {
+func NewAuthHandler(
+    lu *authusecases.LoginUseCase,
+    am *privatemiddlewares.AuthMiddleware,
+    fu *authusecases.FindUserByEmailUseCase,
+    ru *authusecases.RefreshTokenUseCase,
+) *AuthHandler {
 	return &AuthHandler{
         loginUseCase: lu,
         authMiddleware: am,
+        findUserUseCase: fu,
+        refreshTokenUseCase:ru,
     }
 }
 
@@ -32,7 +41,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
         sharedHttp.RespondWithError(w, domainerrors.NewAppError(400, "Bad Request", "Invalid JSON body", err))
         return
     }
-
 	if req.Token == "" {
         sharedHttp.RespondWithError(w, domainerrors.NewAppError(400, "Validation Error", "Token is required", nil))
         return
@@ -42,24 +50,85 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
     }
     session, err := h.loginUseCase.Execute(req.Token,userAgent) 
     if err != nil {
-        // El helper se encarga de loguear y poner el status correcto (401, 404, 500)
         sharedHttp.RespondWithError(w, err)
         return
     }
     refreshToken:= session.RefreshToken
-    responseSession:= &authdtos.ResponseSessionDto{
-        UserData:session.UserData,
+    responseSession:= authdtos.ResponseSessionDto{
+        UserData:authdtos.UserResponseDto{
+            ID:        session.UserData.Id,
+            Email:     session.UserData.Email,
+            PhotoURL:  session.UserData.PhotoUrl,
+            CreatedAt: session.UserData.CreatedAt.Format(time.RFC3339),
+            Credits:   session.UserData.Credits,
+        },
         AccessToken: session.AccessToken,
     }
-    // manejar la cookie de session
     sharedHttp.HandleCookie(w,refreshToken)
-    // 3. Retornar la sesión exitosa en formato JSON
     sharedHttp.RespondWithJSON(w, http.StatusOK, responseSession)
 }
 
 
-func (h *AuthHandler) GetProfile(w http.ResponseWriter, r *http.Request){
+func (h *AuthHandler)RefreshToken(w http.ResponseWriter, r *http.Request){
+    email, ok:= r.Context().Value(privatemiddlewares.EmailContextKey).(string) 
+    if !ok {
+        sharedHttp.RespondWithError(
+            w,
+            domainerrors.NewAppError(
+                401,
+                "Unauthorized",
+                "Email not found in context",
+                nil,
+            ),
+        )
+        return
+    } 
+    newtoken,err:= h.refreshTokenUseCase.Excute(email)
+    if err!= nil{
+        sharedHttp.RespondWithError(
+            w,
+            err,
+        )
+    }
+    response := authdtos.RefreshTokenResponseDto{
+        AccessToken: newtoken.Value(),
+    }
+    sharedHttp.RespondWithJSON(w, http.StatusOK, response)
+}
 
+
+
+
+func (h *AuthHandler) GetProfile(w http.ResponseWriter, r *http.Request){
+    email, ok := r.Context().Value(privatemiddlewares.EmailContextKey).(string)
+    if !ok {
+        sharedHttp.RespondWithError(
+            w,
+            domainerrors.NewAppError(
+                401,
+                "Unauthorized",
+                "Email not found in context",
+                nil,
+            ),
+        )
+        return
+    }
+    session,err:=h.findUserUseCase.Execute(email)
+    if err != nil {
+        sharedHttp.RespondWithError(
+            w,
+            err,
+        )
+        return
+    }
+    user:=authdtos.UserResponseDto{
+        ID:        session.Id,
+        Email:     session.Email,
+        PhotoURL:  session.PhotoUrl,
+        CreatedAt: session.CreatedAt.Format(time.RFC3339),
+        Credits:   session.Credits,
+    }
+    sharedHttp.RespondWithJSON(w, http.StatusOK, user)
 }
 
 

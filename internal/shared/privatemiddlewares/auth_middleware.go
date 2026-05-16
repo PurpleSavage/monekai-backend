@@ -9,7 +9,7 @@ import (
 	sharedHttp "github.com/purplesvage/moneka-ai/internal/shared/in/http"
 )
 
-type Middleware func(http.Handler) http.Handler
+
 type contextKey string
 
 const EmailContextKey contextKey = "email"

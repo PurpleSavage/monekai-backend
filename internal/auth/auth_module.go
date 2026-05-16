@@ -42,7 +42,18 @@ func Bootstrap(db *gorm.DB) *authHttp.AuthHandler {
 		findUserByEmailUC, 
 		updateSessionUC,
 	)
+	// buscar usuario caso de uso
+	findUserUC:= authusecases.NewFindUserByEmailUseCase(repo)
+
+	// refrescar token, caso de uso
+	refreshTokenUC:=authusecases.NewRefreshTokenUseCase(jwt)
+
 
 	// 4. Handler (Entrada)
-	return authHttp.NewAuthHandler(loginUC,authMiddleware)
+	return authHttp.NewAuthHandler(
+		loginUC,
+		authMiddleware,
+		findUserUC,
+		refreshTokenUC,
+	)
 }
