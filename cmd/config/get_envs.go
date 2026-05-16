@@ -9,7 +9,7 @@ type ConfigEnvs struct{
 	Port string
 	ClerkKey string
 	Host string
-	User string
+	DbUser string
 	DbPassword string
 	DbPort string
 	DbName string 
@@ -23,16 +23,18 @@ func LoadEnvs()  {
 	// el archivo no existirá y no queremos que la app se detenga.
 	_ = godotenv.Load()
 
-	Envs= &ConfigEnvs{
+	Envs = &ConfigEnvs{
 		SecretJwt: getEnv("JWT_SECRET", "default_secret_key"),
 		Port:      getEnv("PORT", "8080"),
-		ClerkKey:getEnv("CLERK_KEY", "default"),
-		Host:getEnv("HOST", "default"),
-		User:getEnv("USER:", "default"),
-		DbPassword:getEnv("DB_PASSWORD", "default"),
-		DbName:getEnv("DB_NAME", "default"),
-		DbPort:getEnv("DB_PORT", "default"),
-		SslMode:getEnv("SSLMODE", "disabled"),
+
+		ClerkKey: getEnv("CLERK_KEY", "default"),
+
+		Host:       getEnv("HOST", "localhost"),
+		DbUser:     getEnv("DB_USER", "postgres"),
+		DbPassword: getEnv("DB_PASSWORD", ""),
+		DbName:     getEnv("DB_NAME", "postgres"),
+		DbPort:     getEnv("DB_PORT", "5432"),
+		SslMode:    getEnv("DB_SSLMODE", "disable"),
 	}
 }
 

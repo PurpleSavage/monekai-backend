@@ -17,7 +17,7 @@ func main(){
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
 		config.Envs.Host,
-		config.Envs.User, 
+		config.Envs.DbUser,
 		config.Envs.DbPassword,
 		config.Envs.DbName,
 		config.Envs.DbPort,

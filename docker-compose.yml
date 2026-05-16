@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
       - "${DB_PORT}:5432"
@@ -25,10 +25,10 @@ services:
     environment:
       - HOST=db
       - USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASS}
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
       - DB_PORT=${DB_PORT}
-      - SSLMODE=${SSLMODE}
+      - SSLMODE=${DB_SSLMODE}
       - JWT_SECRET=${JWT_SECRET}
       - CLERK_KEY=${CLERK_KEY}
       - PUBLIC_KEY=${PUBLIC_KEY}
