@@ -12,7 +12,8 @@ type RegisterUseCase struct{
 	repo authports.UserPersistencePort
 }
 func NewRegisterUseCase(
-	repo authports.UserPersistencePort) *RegisterUseCase{
+	repo authports.UserPersistencePort,
+) *RegisterUseCase{
 	return  &RegisterUseCase{
 		repo: repo,
 	}

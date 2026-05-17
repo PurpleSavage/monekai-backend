@@ -1,12 +1,17 @@
 package main
+
 import (
 	"fmt"
 	"log"
 	"net/http"
+
 	"github.com/purplesvage/moneka-ai/cmd/config"
-	"github.com/purplesvage/moneka-ai/pkg/connection"
+	"github.com/purplesvage/moneka-ai/internal/audio"
 	"github.com/purplesvage/moneka-ai/internal/auth"
 	authHttp "github.com/purplesvage/moneka-ai/internal/auth/in/http"
+	audioHttp "github.com/purplesvage/moneka-ai/internal/audio/in/http"
+	sharedvalidators "github.com/purplesvage/moneka-ai/internal/shared/in/validators"
+	"github.com/purplesvage/moneka-ai/pkg/connection"
 )
 
 func main(){
@@ -29,12 +34,22 @@ func main(){
 		log.Fatal("Error conectando a la base de datos:", err)
 	}
 
+
+
+	// ─── 1. INSTANCIAS GLOBALES COMPARTIDAS ───
+    dtoValidator := sharedvalidators.NewDTOValidator()
+
+
 	//--- Módulo AUTH ---
 	authHandler := auth.Bootstrap(db)
 	authMux := http.NewServeMux()	
 	authHttp.MapRoutes(authMux,authHandler)
 	mainMux.Handle("/auth/", http.StripPrefix("/auth", authMux))
-	//
+	//--- Módulo AUDIO---
+	audioHandler:= audio.Bootstrap(dtoValidator)
+	audioMux:= http.NewServeMux()
+	audioHttp.MapRoutes(audioMux,audioHandler)
+	mainMux.Handle("/audio/", http.StripPrefix("/audio", authMux))
 	
 
 

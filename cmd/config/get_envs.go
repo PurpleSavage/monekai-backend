@@ -14,6 +14,8 @@ type ConfigEnvs struct{
 	DbPort string
 	DbName string 
 	SslMode string
+	ReplicateKey string
+	BackendServerBaseUrl string
 }
 
 var Envs *ConfigEnvs
@@ -35,6 +37,9 @@ func LoadEnvs()  {
 		DbName:     getEnv("DB_NAME", "postgres"),
 		DbPort:     getEnv("DB_PORT", "5432"),
 		SslMode:    getEnv("DB_SSLMODE", "disable"),
+
+		ReplicateKey: getEnv("REPLICATE_KEY","default"),
+		BackendServerBaseUrl: getEnv("BACKED_SERVER_URL","default"),
 	}
 }
 

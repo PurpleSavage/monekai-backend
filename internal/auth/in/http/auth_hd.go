@@ -137,14 +137,23 @@ func MapRoutes(mux *http.ServeMux, h *AuthHandler) {
 		h.authMiddleware.RefreshToken,
 	}
 
-    //ruta login
+    //ruta -> entrar o crear una cuenta 
 	mux.HandleFunc("POST /login", h.Login)
 
 
-    // ruta 
+    // ruta -> obtener perfil
 	protectedHandler := middlewares.ContextMiddleware(
 		http.HandlerFunc(h.GetProfile),
 		mdls,
 	)
-	mux.Handle("POST /profile", protectedHandler)
+	mux.Handle("GET /profile", protectedHandler)
+
+
+
+    // ruta -> refrescar token
+    protectedHandlerRefreshToken:=middlewares.ContextMiddleware(
+		http.HandlerFunc(h.RefreshToken),
+		mdls,
+	)
+	mux.Handle("GET /profile", protectedHandlerRefreshToken)
 }

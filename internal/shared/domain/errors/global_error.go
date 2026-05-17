@@ -7,6 +7,7 @@ type AppError struct {
     Message string
     Status  int // Ej: 404, 400, 500
     Err     error // El error original (para debugging)
+    Details map[string]string `json:"details,omitempty"`
 }
 
 // Implementamos la interfaz 'error' de Go
@@ -21,4 +22,9 @@ func NewAppError(status int, title, message string, err error) *AppError {
         Message: message,
         Err:     err,
     }
+}
+
+func (e *AppError) WithDetails(details map[string]string) *AppError {
+    e.Details = details
+    return e
 }
