@@ -58,7 +58,7 @@ func main(){
 
 
 
-	log.Println("Servidor iniciado en Piura: puerto 8080")
+	log.Println("Server starting: port 8080")
 	if err := http.ListenAndServe(":8080", mainMux); err != nil {
 		log.Fatal(err)
 	}
