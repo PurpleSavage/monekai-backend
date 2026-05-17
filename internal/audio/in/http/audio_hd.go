@@ -3,6 +3,8 @@ package http
 import (
 	"encoding/json"
 	"net/http"
+
+	audioinadapters "github.com/purplesvage/moneka-ai/internal/audio/in/adapters"
 	audioincommands "github.com/purplesvage/moneka-ai/internal/audio/in/dtos/commands"
 	audiousecases "github.com/purplesvage/moneka-ai/internal/audio/usecases"
 	domainerrors "github.com/purplesvage/moneka-ai/internal/shared/domain/errors"
@@ -16,17 +18,20 @@ type AudioHandler struct {
 	authMiddleware *privatemiddlewares.AuthMiddleware
 	generateSongUseCase *audiousecases.GenerateSongUseCase
 	validator           *sharedvalidators.DTOValidator
+	sseManager *audioinadapters.SSEManager
 }
 
 func NewAudioHandler(
 	am *privatemiddlewares.AuthMiddleware,
 	gs *audiousecases.GenerateSongUseCase, 
 	v *sharedvalidators.DTOValidator,
+	sse *audioinadapters.SSEManager,
 ) *AudioHandler {
 	return &AudioHandler{
 		authMiddleware: am,
 		generateSongUseCase:gs,
 		validator:           v,
+		sseManager:sse,
 	}
 }
 

@@ -7,9 +7,10 @@ import (
 
 	"github.com/purplesvage/moneka-ai/cmd/config"
 	"github.com/purplesvage/moneka-ai/internal/audio"
+	audioHttp "github.com/purplesvage/moneka-ai/internal/audio/in/http"
+	audiosse "github.com/purplesvage/moneka-ai/internal/audio/in/sse"
 	"github.com/purplesvage/moneka-ai/internal/auth"
 	authHttp "github.com/purplesvage/moneka-ai/internal/auth/in/http"
-	audioHttp "github.com/purplesvage/moneka-ai/internal/audio/in/http"
 	sharedvalidators "github.com/purplesvage/moneka-ai/internal/shared/in/validators"
 	"github.com/purplesvage/moneka-ai/pkg/connection"
 )
@@ -45,11 +46,14 @@ func main(){
 	authMux := http.NewServeMux()	
 	authHttp.MapRoutes(authMux,authHandler)
 	mainMux.Handle("/auth/", http.StripPrefix("/auth", authMux))
+
+	
 	//--- Módulo AUDIO---
-	audioHandler:= audio.Bootstrap(dtoValidator)
+	audioHandler, audioSSEHandler := audio.Bootstrap(dtoValidator)
 	audioMux:= http.NewServeMux()
 	audioHttp.MapRoutes(audioMux,audioHandler)
-	mainMux.Handle("/audio/", http.StripPrefix("/audio", authMux))
+	audiosse.MapSSERoutes(audioMux, audioSSEHandler)
+	mainMux.Handle("/audio/", http.StripPrefix("/audio", audioMux))
 	
 
 

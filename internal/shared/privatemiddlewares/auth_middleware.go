@@ -22,7 +22,7 @@ func NewAuthMiddleware(JwtService sharedports.JwtPort) *AuthMiddleware {
 		JwtService: JwtService,
 	}
 }
-func (a *AuthMiddleware) AccesToken(next http.Handler)http.Handler{
+func (a *AuthMiddleware) AccessToken(next http.Handler)http.Handler{
 	return  http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
 		authHeader := r.Header.Get("Authorization")
         if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
